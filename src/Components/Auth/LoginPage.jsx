@@ -12,7 +12,6 @@ const portals = [
   { id: "client", title: "Client", description: "Track project progress", icon: <FaUsers /> },
 ];
 
-// Map frontend portal IDs to backend role names
 const roleMap = {
   employee: "Employee",
   admin: "Admin",
@@ -32,34 +31,37 @@ const LoginPage = () => {
     setLoading(true);
 
     try {
-      // Send only email & password; backend determines role
       const res = await axios.post("http://localhost:5000/api/auth/login", {
         email,
-        password
+        password,
+        role: roleMap[selectedPortal],
       });
 
-      // Save token and role
+      // Save user info in localStorage
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("role", res.data.role);
+      localStorage.setItem("name", res.data.name);
+      localStorage.setItem("department", res.data.department);
 
-      // Redirect based on backend role
-      switch (res.data.role) {
-        case "Admin":
+      // Redirect to correct dashboard
+      switch (res.data.role.toLowerCase()) {
+        case "admin":
           navigate("/admin/dashboard");
           break;
-        case "Employee":
+        case "employee":
           navigate("/employee/dashboard");
           break;
-        case "SuperAdmin":
+        case "superadmin":
           navigate("/superadmin/dashboard");
           break;
-        case "Client":
+        case "client":
           navigate("/client/dashboard");
           break;
         default:
           alert("Unknown role");
       }
     } catch (err) {
+      console.error("Login error:", err);
       alert(err.response?.data?.error || "Login failed");
     } finally {
       setLoading(false);
@@ -69,7 +71,6 @@ const LoginPage = () => {
   return (
     <div className="login-wrapper">
       <div className="login-card">
-        {/* Left: Portal selection */}
         <div className="portal-section">
           <div className="brand">
             <div className="logo">📊</div>
@@ -77,9 +78,7 @@ const LoginPage = () => {
             <p className="tagline">Enterprise Suite</p>
           </div>
 
-          <h3 className="section-title">Select Your Portal</h3>
-          <p className="section-subtitle">Choose the portal that matches your role</p>
-
+          <h3>Select Your Portal</h3>
           <div className="portal-grid">
             {portals.map((portal) => (
               <div
@@ -97,16 +96,13 @@ const LoginPage = () => {
           </div>
         </div>
 
-        {/* Right: Login form */}
         <div className="form-section">
           <h3>Sign In</h3>
-          <p className="portal-name">
-            {portals.find((p) => p.id === selectedPortal)?.title} Portal
-          </p>
+          <p>{portals.find((p) => p.id === selectedPortal)?.title} Portal</p>
 
           <form onSubmit={handleLogin}>
             <div className="form-group">
-              <label>Email Address</label>
+              <label>Email</label>
               <input
                 type="email"
                 placeholder="john.smith@company.com"
@@ -127,13 +123,12 @@ const LoginPage = () => {
               />
             </div>
 
-            <button type="submit" className="btn-submit" disabled={loading}>
-              {loading ? "Signing In..." : `Sign In as ${portals.find(p => p.id === selectedPortal)?.title}`}
+            <button type="submit" disabled={loading}>
+              {loading ? "Signing In..." : `Sign In as ${portals.find((p) => p.id === selectedPortal)?.title}`}
             </button>
           </form>
         </div>
       </div>
-
       <footer>© 2025 SaaSPlatform. All rights reserved.</footer>
     </div>
   );

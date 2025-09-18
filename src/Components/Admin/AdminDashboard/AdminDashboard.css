@@ -1,4 +1,9 @@
 
+body {
+  background: #f0f2f5; /* light grey */
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
 
 .welcome-section {
   display: flex;

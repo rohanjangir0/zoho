@@ -11,14 +11,12 @@ import ProtectedRoute from "./Components/common/ProtectedRoute";
 function App() {
   return (
     <Routes>
-      {/* Public Login Route */}
       <Route path="/" element={<LoginPage />} />
 
-      {/* Employee Routes (Protected) */}
       <Route
-        path="/employee"
+        path="/employee/*"
         element={
-          <ProtectedRoute role="employee">
+          <ProtectedRoute role="Employee">
             <EmployeeLayout />
           </ProtectedRoute>
         }
@@ -28,11 +26,10 @@ function App() {
         ))}
       </Route>
 
-      {/* Admin Routes (Protected) */}
       <Route
-        path="/admin"
+        path="/admin/*"
         element={
-          <ProtectedRoute role="admin">
+          <ProtectedRoute role="Admin">
             <AdminLayout />
           </ProtectedRoute>
         }

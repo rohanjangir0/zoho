@@ -1,12 +1,14 @@
+// src/Components/common/ProtectedRoute.jsx
 import React from "react";
 import { Navigate } from "react-router-dom";
 
-const ProtectedRoute = ({ children, role }) => {
-  const token = localStorage.getItem("token");
+const ProtectedRoute = ({ role, children }) => {
   const userRole = localStorage.getItem("role");
 
-  if (!token) return <Navigate to="/" replace />;
-  if (role && role !== userRole) return <Navigate to="/" replace />;
+  if (!userRole) return <Navigate to="/" />;
+
+  // Case-insensitive check
+  if (userRole.toLowerCase() !== role.toLowerCase()) return <Navigate to="/" />;
 
   return children;
 };

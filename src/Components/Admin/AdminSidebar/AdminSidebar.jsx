@@ -1,50 +1,53 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
+import { LayoutDashboard, Users, ClipboardList, CalendarCheck2, BarChart3, Settings, LogOut } from "lucide-react";
 import "./AdminSidebar.css";
 
 export default function AdminSidebar() {
   return (
-    <div className="sidebar">
-      <div className="sidebar-header">
-        <h2>Employee Portal</h2>
-        <p>Personal Dashboard</p>
+    <aside className="admin-sidebar">
+      {/* Logo / Header */}
+      <div className="sidebar-logo">
+        <div className="logo-icon">🟢</div>
+        <div>
+          <h2>Admin Portal</h2>
+          <p>Management Dashboard</p>
+        </div>
       </div>
 
+      {/* Navigation */}
       <nav className="sidebar-nav">
-        <NavLink to="dashboard" className={({ isActive }) => isActive ? "active" : ""}>
-          <span>📊</span> Dashboard
+        <NavLink to="/admin/dashboard" className="nav-link">
+          <LayoutDashboard size={18} /> Dashboard
         </NavLink>
-        <NavLink to="tasks" className={({ isActive }) => isActive ? "active" : ""}>
-          <span>✅</span> Employee Management
+        <NavLink to="/admin/employee-management" className="nav-link">
+          <Users size={18} /> Employee Management
         </NavLink>
-        <NavLink to="attendance" className={({ isActive }) => isActive ? "active" : ""}>
-          <span>⏰</span> Task Management
+        <NavLink to="/admin/task-management" className="nav-link">
+          <ClipboardList size={18} /> Task Management
         </NavLink>
-        <NavLink to="/admin/leave-approvals" className={({ isActive }) => (isActive ? "active" : "")}>
-          📅 Leave Approvals
+        <NavLink to="/admin/leave-approvals" className="nav-link">
+          <CalendarCheck2 size={18} /> Leave Approvals
         </NavLink>
-        <NavLink to="payroll" className={({ isActive }) => isActive ? "active" : ""}>
-          <span>💲</span> Payroll
+        <NavLink to="/admin/analytics" className="nav-link">
+          <BarChart3 size={18} /> Analytics & Reports
         </NavLink>
-        <NavLink to="documents" className={({ isActive }) => isActive ? "active" : ""}>
-          <span>📂</span> Documents
-        </NavLink>
-        <NavLink to="chat" className={({ isActive }) => isActive ? "active" : ""}>
-          <span>💬</span> Chat
+        <NavLink to="/admin/settings" className="nav-link">
+          <Settings size={18} /> Settings
         </NavLink>
       </nav>
 
-      <div className="sidebar-footer">
+      {/* User Profile */}
+      <div className="sidebar-user">
+        <div className="user-avatar">SJ</div>
         <div className="user-info">
-          <div className="user-avatar">JS</div>
-          <div>
-            <h4>John Smith</h4>
-            <p>Senior Developer</p>
-            <p>ID: EMP-001</p>
-          </div>
+          <h4>Sarah Johnson</h4>
+          <p>HR Manager • HR</p>
         </div>
-        <button className="logout-btn">⏻ Logout</button>
       </div>
-    </div>
+      <button className="logout-btn">
+        <LogOut size={18} /> Logout
+      </button>
+    </aside>
   );
 }

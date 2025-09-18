@@ -1,48 +1,70 @@
-.navbar {
+.admin-navbar {
   height: 70px;
   background: #fff;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid #e5e7eb;
   display: flex;
-  align-items: center;
   justify-content: space-between;
-  padding: 0 20px;
-  position: fixed;
-  top: 0;
-  left: 250px;
-  right: 0;
-  z-index: 1000;
+  align-items: center;
+  padding: 0 1.5rem;
+  transform: translateX(2rem);
 }
 
 .navbar-left h2 {
-  margin: 0;
-  font-size: 20px;
+  font-size: 1.2rem;
   font-weight: 600;
 }
 
 .navbar-left p {
-  margin: 2px 0 0;
-  font-size: 13px;
-  color: #666;
-}
-
-.search-bar {
-  width: 300px;
-  padding: 8px 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
+  font-size: 0.8rem;
+  color: #6b7280;
 }
 
 .navbar-right {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 1rem;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #e5e7eb;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  background: #f9fafb;
+}
+
+.search-box input {
+  border: none;
+  outline: none;
+  background: transparent;
+}
+
+.btn-light {
+  padding: 0.5rem 0.8rem;
+  border: 1px solid #d1d5db;
+  background: #fff;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-dark {
+  padding: 0.5rem 0.8rem;
+  background: #111827;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
 }
 
 .icon-btn {
-  background: transparent;
-  border: none;
-  font-size: 20px;
   cursor: pointer;
-  padding: 5px;
+  color: #374151;
 }
