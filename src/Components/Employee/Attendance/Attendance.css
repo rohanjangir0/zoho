@@ -1,0 +1,124 @@
+.attendance-container {
+  padding: 20px;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.page-title {
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.subtitle {
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.time-clock-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.current-time h1 {
+  font-size: 36px;
+  margin: 0;
+}
+
+.clock-info p {
+  margin: 5px 0;
+}
+
+.clock-btn {
+  background: #28a745;
+  color: #fff;
+  border: none;
+  padding: 12px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.clock-btn:hover {
+  background: #218838;
+}
+
+.red-dot {
+  height: 10px;
+  width: 10px;
+  background: red;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.stats-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.stat-card {
+  background: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.big-text {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.attendance-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+.attendance-table th,
+.attendance-table td {
+  border: 1px solid #eee;
+  padding: 10px;
+  text-align: center;
+}
+
+.attendance-table th {
+  background: #f9f9f9;
+}
+
+.present {
+  color: green;
+  font-weight: bold;
+}
+
+.late {
+  color: orange;
+  font-weight: bold;
+}
+
+.leave {
+  color: blue;
+  font-weight: bold;
+}
+
+.bottom-section {
+  display: flex;
+  gap: 20px;
+}
+
+.weekly-overview, .break-tracking {
+  flex: 1;
+  background: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
