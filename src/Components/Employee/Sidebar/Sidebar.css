@@ -2,14 +2,22 @@
   position: fixed;
   top: 0;
   left: 0;
-  width: 250px;
+  width: 150px;   /* reduce from 850px */
   height: 100vh;
   background: #fff;
   border-right: 1px solid #e5e5e5;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  z-index: 1000; /* keep it above main content */
 }
+
+/* Shift main content */
+.main-content {
+  margin-left: 150px;  /* equal to sidebar width */
+  padding: 10px;
+}
+
 
 .sidebar-header {
   padding: 20px;

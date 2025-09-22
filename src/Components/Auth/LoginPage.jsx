@@ -6,132 +6,183 @@ import { MdOutlineAdminPanelSettings } from "react-icons/md";
 import axios from "axios";
 
 const portals = [
-  { id: "employee", title: "Employee", description: "Access your tasks & dashboard", icon: <FaUser /> },
-  { id: "admin", title: "Admin", description: "Manage employees & approvals", icon: <MdOutlineAdminPanelSettings /> },
-  { id: "superadmin", title: "Super Admin", description: "Full company access", icon: <FaUserShield /> },
-  { id: "client", title: "Client", description: "Track project progress", icon: <FaUsers /> },
+  { id: "admin", title: "Admin", subtitle: "Manage employees & approvals", icon: <MdOutlineAdminPanelSettings /> },
+  { id: "employee", title: "Employee", subtitle: "Personal dashboard & tasks", icon: <FaUser /> },
+  { id: "superadmin", title: "Super Admin", subtitle: "Organization control", icon: <FaUserShield /> },
+  { id: "client", title: "Client", subtitle: "Project status & reports", icon: <FaUsers /> },
 ];
 
-const roleMap = {
-  employee: "Employee",
-  admin: "Admin",
-  superadmin: "SuperAdmin",
-  client: "Client",
-};
+const roleMap = { admin: "Admin", superadmin: "SuperAdmin", client: "Client" };
 
-const LoginPage = () => {
+export default function LoginPage() {
   const [selectedPortal, setSelectedPortal] = useState("employee");
-  const [email, setEmail] = useState("");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  const selectPortal = (id) => {
+    setSelectedPortal(id);
+    setIdentifier("");
+    setPassword("");
+  };
+
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
-        email,
-        password,
-        role: roleMap[selectedPortal],
-      });
+      let res;
 
-      // Save user info in localStorage
-      localStorage.setItem("token", res.data.token);
-      localStorage.setItem("role", res.data.role);
-      localStorage.setItem("name", res.data.name);
-      localStorage.setItem("department", res.data.department);
+      if (selectedPortal === "employee") {
+        res = await axios.post("http://localhost:5000/api/employees/login", {
+          employeeId: identifier,
+          password,
+        });
 
-      // Redirect to correct dashboard
-      switch (res.data.role.toLowerCase()) {
-        case "admin":
-          navigate("/admin/dashboard");
-          break;
-        case "employee":
-          navigate("/employee/dashboard");
-          break;
-        case "superadmin":
-          navigate("/superadmin/dashboard");
-          break;
-        case "client":
-          navigate("/client/dashboard");
-          break;
-        default:
-          alert("Unknown role");
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("role", "Employee");
+        localStorage.setItem("name", res.data.employee.name);
+        localStorage.setItem("employeeId", res.data.employee.employeeId);
+
+        navigate("/employee/dashboard");
+      } else {
+        res = await axios.post("http://localhost:5000/api/auth/login", {
+          email: identifier,
+          password,
+          role: roleMap[selectedPortal],
+        });
+
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("role", res.data.role);
+        localStorage.setItem("name", res.data.name);
+        localStorage.setItem("department", res.data.department);
+
+        const role = res.data.role?.toLowerCase();
+        if (role === "admin") navigate("/admin/dashboard");
+        else if (role === "superadmin") navigate("/superadmin/dashboard");
+        else if (role === "client") navigate("/client/dashboard");
+        else navigate("/");
       }
     } catch (err) {
-      console.error("Login error:", err);
-      alert(err.response?.data?.error || "Login failed");
+      console.error(err);
+      alert(err.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);
     }
   };
 
+  const currentPortal = portals.find((p) => p.id === selectedPortal);
+
   return (
-    <div className="login-wrapper">
-      <div className="login-card">
-        <div className="portal-section">
+    <div className="login-page">
+      <div className="login-wrapper">
+
+        {/* LEFT — Portal selector */}
+        <aside className="portal-section">
           <div className="brand">
-            <div className="logo">📊</div>
-            <h2>SaaSPlatform</h2>
-            <p className="tagline">Enterprise Suite</p>
+            <div className="logo">SP</div>
+            <div>
+              <h1>SaaSPlatform</h1>
+              <p>Enterprise tools · Secure · Fast</p>
+            </div>
           </div>
 
-          <h3>Select Your Portal</h3>
+          <h2>Sign in to your portal</h2>
+
           <div className="portal-grid">
-            {portals.map((portal) => (
+            {portals.map((p) => (
               <div
-                key={portal.id}
-                className={`portal-card ${selectedPortal === portal.id ? "active" : ""}`}
-                onClick={() => setSelectedPortal(portal.id)}
+                key={p.id}
+                className={`portal-card ${selectedPortal === p.id ? "active" : ""}`}
+                onClick={() => selectPortal(p.id)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => e.key === "Enter" && selectPortal(p.id)}
+                aria-pressed={selectedPortal === p.id}
               >
-                <div className="portal-icon">{portal.icon}</div>
-                <div className="portal-info">
-                  <h4>{portal.title}</h4>
-                  <p>{portal.description}</p>
+                <div className="icon">{p.icon}</div>
+                <div className="meta">
+                  <h4>{p.title}</h4>
+                  <p>{p.subtitle}</p>
                 </div>
               </div>
             ))}
           </div>
-        </div>
 
-        <div className="form-section">
-          <h3>Sign In</h3>
-          <p>{portals.find((p) => p.id === selectedPortal)?.title} Portal</p>
+          <div style={{ marginTop: 18, color: "#6b7280", fontSize: 13 }}>
+            Tip: choose the portal on left — the form on the right will adapt.
+          </div>
+        </aside>
 
-          <form onSubmit={handleLogin}>
-            <div className="form-group">
-              <label>Email</label>
-              <input
-                type="email"
-                placeholder="john.smith@company.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
+        {/* RIGHT — Login form */}
+        <main className="form-section">
+          <div className="form-card">
+            <h3>{currentPortal.title} Login</h3>
+            <p className="subtitle">Secure sign-in for {currentPortal.title.toLowerCase()}</p>
 
-            <div className="form-group">
-              <label>Password</label>
-              <input
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
+            <form onSubmit={handleLogin} aria-label={`${currentPortal.title} login form`}>
+              <div className="form-group">
+                <label>{selectedPortal === "employee" ? "Employee ID" : "Email address"}</label>
+                <input
+                  type={selectedPortal === "employee" ? "text" : "email"}
+                  placeholder={selectedPortal === "employee" ? "EMP-123456" : "name@company.com"}
+                  value={identifier}
+                  onChange={(e) => setIdentifier(e.target.value)}
+                  required
+                  aria-required="true"
+                />
+              </div>
 
-            <button type="submit" disabled={loading}>
-              {loading ? "Signing In..." : `Sign In as ${portals.find((p) => p.id === selectedPortal)?.title}`}
-            </button>
-          </form>
-        </div>
+              <div className="form-group">
+                <label>Password</label>
+                <input
+                  type="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  aria-required="true"
+                />
+              </div>
+
+              {/* Demo Login Button */}
+              {selectedPortal !== "employee" && (
+                <div style={{ marginBottom: "12px" }}>
+                  <button
+                    type="button"
+                    className="btn-demo"
+                    onClick={() => {
+                      if (selectedPortal === "admin") {
+                        setIdentifier("admin@company.com");
+                        setPassword("Admin@123");
+                      } else if (selectedPortal === "superadmin") {
+                        setIdentifier("superadmin@company.com");
+                        setPassword("SuperAdmin@123");
+                      } else if (selectedPortal === "client") {
+                        setIdentifier("client@company.com");
+                        setPassword("Client@123");
+                      }
+                    }}
+                  >
+                    Demo Login
+                  </button>
+                </div>
+              )}
+
+              <div className="actions">
+                <button className="btn-submit" type="submit" disabled={loading}>
+                  {loading ? "Signing in…" : `Sign in as ${currentPortal.title}`}
+                </button>
+              </div>
+
+              <div style={{ marginTop: 12, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <a className="link-muted" href="#forgot">Forgot password?</a>
+                <a className="link-muted" href="#help">Need help?</a>
+              </div>
+            </form>
+          </div>
+        </main>
       </div>
-      <footer>© 2025 SaaSPlatform. All rights reserved.</footer>
     </div>
   );
-};
-
-export default LoginPage;
+}

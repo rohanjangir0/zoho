@@ -2,14 +2,17 @@ import React from "react";
 import { Outlet } from "react-router-dom";
 import Sidebar from "./Sidebar/Sidebar";
 import Navbar from "./Navbar/Navbar";
+import "./EmployeeLayout.css";
 
 const EmployeeLayout = () => {
   return (
-    <div>
+    <div className="employee-layout">
       <Sidebar />
-      <Navbar />
-      <div style={{ marginLeft: "250px", marginTop: "70px", padding: "20px" }}>
-        <Outlet /> {/* employee pages will render here */}
+      <div className="main-area">
+        <Navbar />
+        <div className="content">
+          <Outlet /> {/* employee pages will render here */}
+        </div>
       </div>
     </div>
   );
