@@ -1,6 +1,15 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, Users, ClipboardList, CalendarCheck2, BarChart3, Settings, LogOut } from "lucide-react";
+import {
+  LayoutDashboard,
+  Users,
+  ClipboardList,
+  CalendarCheck2,
+  BarChart3,
+  MessageSquare,
+  Settings,
+  LogOut,
+} from "lucide-react";
 import "./AdminSidebar.css";
 
 export default function AdminSidebar() {
@@ -32,6 +41,12 @@ export default function AdminSidebar() {
         <NavLink to="/admin/analytics" className="nav-link">
           <BarChart3 size={18} /> Analytics & Reports
         </NavLink>
+
+        {/* ✅ Chat Option */}
+        <NavLink to="/admin/chat" className="nav-link">
+          <MessageSquare size={18} /> Chat
+        </NavLink>
+
         <NavLink to="/admin/settings" className="nav-link">
           <Settings size={18} /> Settings
         </NavLink>
