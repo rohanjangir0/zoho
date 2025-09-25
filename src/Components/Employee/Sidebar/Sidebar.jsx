@@ -3,74 +3,38 @@ import { NavLink } from "react-router-dom";
 import "./Sidebar.css";
 
 export default function Sidebar() {
+  const navItems = [
+    { name: "Dashboard", icon: "dashboard", path: "/employee/dashboard" },
+    { name: "Tasks", icon: "check_circle_outline", path: "/employee/tasks" },
+    { name: "Attendance", icon: "access_time", path: "/employee/attendance" },
+    { name: "Leave Requests", icon: "event_note", path: "/employee/leave-requests" },
+    { name: "Payroll", icon: "attach_money", path: "/employee/payroll" },
+    { name: "Documents", icon: "folder_open", path: "/employee/documents" },
+    { name: "Chat", icon: "chat_bubble_outline", path: "/employee/chat" },
+  ];
+
   return (
     <div className="sidebar">
       <div className="sidebar-header">
         <h2>Employee Portal</h2>
-        <p>Personal Dashboard</p>
+        <p>Dashboard</p>
       </div>
 
       <nav className="sidebar-nav">
-        <NavLink
-          to="/employee/dashboard"
-          className={({ isActive }) => (isActive ? "active" : "")}
-        >
-          <span>📊</span> Dashboard
-        </NavLink>
-
-        <NavLink
-          to="/employee/tasks"
-          className={({ isActive }) => (isActive ? "active" : "")}
-        >
-          <span>✅</span> Tasks
-        </NavLink>
-
-        <NavLink
-          to="/employee/attendance"
-          className={({ isActive }) => (isActive ? "active" : "")}
-        >
-          <span>⏰</span> Attendance
-        </NavLink>
-
-        <NavLink
-          to="/employee/leave-requests"
-          className={({ isActive }) => (isActive ? "active" : "")}
-        >
-          <span>📅</span> Leave Requests
-        </NavLink>
-
-        <NavLink
-          to="/employee/payroll"
-          className={({ isActive }) => (isActive ? "active" : "")}
-        >
-          <span>💲</span> Payroll
-        </NavLink>
-
-        <NavLink
-          to="/employee/documents"
-          className={({ isActive }) => (isActive ? "active" : "")}
-        >
-          <span>📂</span> Documents
-        </NavLink>
-
-        <NavLink
-          to="/employee/chat"
-          className={({ isActive }) => (isActive ? "active" : "")}
-        >
-          <span>💬</span> Chat
-        </NavLink>
+        {navItems.map((item) => (
+          <NavLink
+            key={item.name}
+            to={item.path}
+            className={({ isActive }) => (isActive ? "active" : "")}
+          >
+            <span className="material-symbols-outlined">{item.icon}</span>
+            {item.name}
+          </NavLink>
+        ))}
       </nav>
 
       <div className="sidebar-footer">
-        <div className="user-info">
-          <div className="user-avatar">JS</div>
-          <div>
-            <h4>John Smith</h4>
-            <p>Senior Developer</p>
-            <p>ID: EMP-001</p>
-          </div>
-        </div>
-        <button className="logout-btn">⏻ Logout</button>
+        <button className="logout-btn">logout</button>
       </div>
     </div>
   );

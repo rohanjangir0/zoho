@@ -7,6 +7,7 @@ import {
   CalendarCheck2,
   BarChart3,
   MessageSquare,
+  FileText,
   Settings,
   LogOut,
 } from "lucide-react";
@@ -38,15 +39,15 @@ export default function AdminSidebar() {
         <NavLink to="/admin/leave-approvals" className="nav-link">
           <CalendarCheck2 size={18} /> Leave Approvals
         </NavLink>
-        <NavLink to="/admin/analytics" className="nav-link">
-          <BarChart3 size={18} /> Analytics & Reports
+        <NavLink to="/admin/documents" className="nav-link">
+          <FileText size={18} /> Documents
         </NavLink>
-
-        {/* ✅ Chat Option */}
         <NavLink to="/admin/chat" className="nav-link">
           <MessageSquare size={18} /> Chat
         </NavLink>
-
+        <NavLink to="/admin/analytics" className="nav-link">
+          <BarChart3 size={18} /> Analytics & Reports
+        </NavLink>
         <NavLink to="/admin/settings" className="nav-link">
           <Settings size={18} /> Settings
         </NavLink>

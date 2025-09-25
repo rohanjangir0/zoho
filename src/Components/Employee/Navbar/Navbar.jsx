@@ -6,7 +6,7 @@ export default function Navbar() {
     <div className="navbar">
       <div className="navbar-left">
         <h2>Dashboard</h2>
-        <p>Welcome back, John Smith</p>
+        <p>Welcome back</p>
       </div>
 
       <div className="navbar-center">
@@ -14,14 +14,7 @@ export default function Navbar() {
       </div>
 
       <div className="navbar-right">
-        <div className="status">
-          <span className="dot"></span>
-          <span>Clocked In</span>
-        </div>
-        <button className="clockout-btn">Clock Out</button>
-
-        <button className="icon-btn">🔔</button>
-        <button className="icon-btn">⚙️</button>
+        <button className="icon-btn material-symbols-outlined">settings</button>
       </div>
     </div>
   );

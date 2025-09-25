@@ -34,18 +34,21 @@ export default function LoginPage() {
       let res;
 
       if (selectedPortal === "employee") {
+        // Employee login with employeeId + password
         res = await axios.post("http://localhost:5000/api/employees/login", {
           employeeId: identifier,
           password,
         });
 
-        localStorage.setItem("token", res.data.token);
-        localStorage.setItem("role", "Employee");
-        localStorage.setItem("name", res.data.employee.name);
-        localStorage.setItem("employeeId", res.data.employee.employeeId);
+        // Store token and employee info in localStorage
+        localStorage.setItem("token", res.data.token);           // JWT
+        localStorage.setItem("role", res.data.role);             // "Employee"
+        localStorage.setItem("name", res.data.name);             // employee name
+        localStorage.setItem("employeeId", res.data.employeeId); // employee ID
 
         navigate("/employee/dashboard");
       } else {
+        // Admin / SuperAdmin / Client login with email + password
         res = await axios.post("http://localhost:5000/api/auth/login", {
           email: identifier,
           password,
@@ -64,8 +67,8 @@ export default function LoginPage() {
         else navigate("/");
       }
     } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || "Login failed");
+      console.error("Login error:", err);
+      alert(err.response?.data?.error || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -76,7 +79,6 @@ export default function LoginPage() {
   return (
     <div className="login-page">
       <div className="login-wrapper">
-
         {/* LEFT — Portal selector */}
         <aside className="portal-section">
           <div className="brand">

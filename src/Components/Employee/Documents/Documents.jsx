@@ -1,115 +1,95 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 import "./Documents.css";
 
-const Documents = () => {
-  const [documents, setDocuments] = useState([
-    {
-      id: 1,
-      name: "Resume_Updated_2024.pdf",
-      category: "Personal Documents",
-      size: "2.4 MB",
-      uploaded: "1/15/2024",
-      status: "Approved",
-    },
-  ]);
+const Documents = ({ employeeId }) => {
+  const [documents, setDocuments] = useState([]);
 
-  const handleUpload = (event) => {
+  // Fetch documents
+  useEffect(() => {
+    fetchDocuments();
+  }, []);
+
+  const fetchDocuments = async () => {
+    try {
+      const res = await axios.get(`http://localhost:5000/api/documents/employee/${employeeId}`);
+      setDocuments(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleUpload = async (event) => {
     const file = event.target.files[0];
     if (!file) return;
 
-    const newDoc = {
-      id: Date.now(),
-      name: file.name,
-      category: "Uncategorized",
-      size: `${(file.size / (1024 * 1024)).toFixed(1)} MB`,
-      uploaded: new Date().toLocaleDateString(),
-      status: "Processing",
-    };
+    const formData = new FormData();
+    formData.append("file", file); // must match multer.single("file")
+    formData.append("employeeId", employeeId); // pass employeeId
+    formData.append("category", "Uncategorized");
 
-    setDocuments([newDoc, ...documents]);
+    try {
+      await axios.post("http://localhost:5000/api/documents/upload", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      fetchDocuments(); // refresh after upload
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const handleDelete = (id) => {
-    setDocuments(documents.filter((doc) => doc.id !== id));
+  const handleDownload = (path, name) => {
+    const link = document.createElement("a");
+    link.href = `http://localhost:5000/${path}`;
+    link.download = name;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/documents/${id}`);
+      fetchDocuments();
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
     <div className="doc-container">
       <div className="doc-header">
-        <div>
-          <h2>Document Management</h2>
-          <p>Upload, manage, and organize your important documents.</p>
-        </div>
+        <h2>My Documents</h2>
         <label className="upload-btn">
           + Upload Document
-          <input
-            type="file"
-            style={{ display: "none" }}
-            onChange={handleUpload}
-          />
+          <input type="file" style={{ display: "none" }} onChange={handleUpload} />
         </label>
       </div>
 
-      {/* Summary */}
-      <div className="summary-grid">
-        <div className="summary-card">
-          <h3>{documents.length}</h3>
-          <p>Total Documents</p>
-        </div>
-        <div className="summary-card approved">
-          <h3>{documents.filter((d) => d.status === "Approved").length}</h3>
-          <p>Approved</p>
-        </div>
-        <div className="summary-card processing">
-          <h3>{documents.filter((d) => d.status === "Processing").length}</h3>
-          <p>Processing</p>
-        </div>
-        <div className="summary-card storage">
-          <h3>
-            {(
-              documents.reduce((acc, d) => acc + parseFloat(d.size), 0) || 0
-            ).toFixed(1)}{" "}
-            MB
-          </h3>
-          <p>Storage Used</p>
-        </div>
-      </div>
-
-      {/* Quick Upload Categories */}
-      <h3 className="section-title">Quick Upload</h3>
-      <div className="quick-grid">
-        <button className="quick-card">Personal Documents</button>
-        <button className="quick-card">Identity Documents</button>
-        <button className="quick-card">Certifications</button>
-        <button className="quick-card">Expense Reports</button>
-      </div>
-
-      {/* My Documents */}
-      <h3 className="section-title">My Documents</h3>
       <div className="doc-list">
-        {documents.map((doc) => (
-          <div key={doc.id} className="doc-card">
-            <div>
-              <h4>{doc.name}</h4>
-              <p>
-                {doc.category} • {doc.size} • Uploaded {doc.uploaded}
-              </p>
+        {documents.length === 0 ? (
+          <p>No documents uploaded yet.</p>
+        ) : (
+          documents.map((doc) => (
+            <div key={doc._id} className="doc-card">
+              <div>
+                <h4>{doc.name}</h4>
+                <p>
+                  {doc.category} • {doc.size} • Uploaded {new Date(doc.uploaded).toLocaleDateString()}
+                </p>
+              </div>
+              <div className="doc-actions">
+                <button onClick={() => handleDownload(doc.path, doc.name)}>👁 Download</button>
+                <button
+                  className="delete"
+                  onClick={() => handleDelete(doc._id)}
+                >
+                  🗑 Delete
+                </button>
+              </div>
             </div>
-            <div className="doc-actions">
-              <span className={`status ${doc.status.toLowerCase()}`}>
-                {doc.status}
-              </span>
-              <button title="View">👁</button>
-              <button
-                title="Delete"
-                onClick={() => handleDelete(doc.id)}
-                className="delete"
-              >
-                🗑
-              </button>
-            </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

@@ -1,17 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "./EmployeeDashboard.css";
 import axios from "axios";
 
 export default function EmployeeDashboard() {
-  const [isClockedIn, setIsClockedIn] = useState(false);
-  const [clockInTime, setClockInTime] = useState(null);
-  const [workedHours, setWorkedHours] = useState("0h 0m");
   const [announcements, setAnnouncements] = useState([]);
+  const [reminders, setReminders] = useState([]);
+  const [showReminderPopup, setShowReminderPopup] = useState(false);
+  const [newReminder, setNewReminder] = useState("");
 
   const employeeName = localStorage.getItem("name") || "Employee";
-  const employeeId = localStorage.getItem("employeeId") || "";
 
-  // Fetch announcements from backend
+  // Clock refs
+  const hourRef = useRef(null);
+  const minuteRef = useRef(null);
+  const secondRef = useRef(null);
+
   useEffect(() => {
     axios
       .get("http://localhost:5000/api/announcements")
@@ -19,141 +22,166 @@ export default function EmployeeDashboard() {
       .catch((err) => console.error(err));
   }, []);
 
-  // Update worked hours live if clocked in
   useEffect(() => {
-    let timer;
-    if (isClockedIn && clockInTime) {
-      timer = setInterval(() => {
-        const diff = Date.now() - clockInTime;
-        const hours = Math.floor(diff / (1000 * 60 * 60));
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-        setWorkedHours(`${hours}h ${minutes}m`);
-      }, 1000);
-    }
-    return () => clearInterval(timer);
-  }, [isClockedIn, clockInTime]);
+    const updateClock = () => {
+      const now = new Date();
+      const hours = now.getHours() % 12;
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
+      const milliseconds = now.getMilliseconds();
 
-  const handleClockInOut = () => {
-    if (isClockedIn) {
-      setIsClockedIn(false);
-    } else {
-      setIsClockedIn(true);
-      setClockInTime(Date.now());
-    }
+      const hourDeg = hours * 30 + minutes * 0.5;
+      const minuteDeg = minutes * 6 + seconds * 0.1;
+      const secondDeg = seconds * 6 + milliseconds * 0.006;
+
+      if (hourRef.current) hourRef.current.style.transform = `rotate(${hourDeg}deg)`;
+      if (minuteRef.current) minuteRef.current.style.transform = `rotate(${minuteDeg}deg)`;
+      if (secondRef.current) secondRef.current.style.transform = `rotate(${secondDeg}deg)`;
+    };
+
+    const interval = setInterval(updateClock, 50);
+    updateClock();
+    return () => clearInterval(interval);
+  }, []);
+
+  const stats = [
+    { title: "Tasks Completed", value: 24, sub: "+3 today", color: "#3b82f6" },
+    { title: "Hours Worked", value: "8h 32m", sub: "Today", color: "#2563eb" },
+    { title: "Pending Tasks", value: 8, sub: "2 urgent", color: "#fbbf24" },
+    { title: "Leave Balance", value: "12 days", sub: "Available", color: "#ef4444" },
+  ];
+
+  const actions = [
+    "Create Task",
+    "Request Leave",
+    "Submit Expense",
+    "Team Chat",
+    "View Team",
+  ];
+
+  const achievements = [
+    { title: "Projects Completed", value: 24 },
+    { title: "Top Performer", value: "This Month" },
+  ];
+
+  const handleAddReminder = () => {
+    if (!newReminder) return;
+    const now = new Date();
+    setReminders([{ task: newReminder, time: now.toLocaleString() }, ...reminders]);
+    setNewReminder("");
+    setShowReminderPopup(false);
   };
 
   return (
     <div className="dashboard">
-      {/* Header */}
-      <div className="dashboard-header">
-        <h2>Dashboard</h2>
-        <p>
-          Welcome back, {employeeName} ({employeeId})
-        </p>
-        <div className="status-box">
-          <span className={isClockedIn ? "status green" : "status red"}>
-            {isClockedIn ? "Clocked In" : "Clocked Out"}
-          </span>
-          <button
-            className={isClockedIn ? "btn-red" : "btn-green"}
-            onClick={handleClockInOut}
-          >
-            {isClockedIn ? "Clock Out" : "Clock In"}
-          </button>
+      {/* Hero Section */}
+      <div className="hero-section">
+        <div className="welcome-box">
+          <h2>Welcome Back</h2>
+          <h1>{employeeName}</h1>
+        </div>
+        <div className="clock-box">
+          <div className="analog-clock">
+            <div className="clock-face">
+              <span ref={hourRef} className="hand hour-hand"></span>
+              <span ref={minuteRef} className="hand minute-hand"></span>
+              <span ref={secondRef} className="hand second-hand"></span>
+              <div className="center-dot"></div>
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Stats Row */}
-      <div className="stats-row">
-        <div className="stat-card">
-          <h3>Tasks Completed</h3>
-          <p className="stat-value">24</p>
-          <span className="stat-sub">+3 today</span>
-        </div>
-        <div className="stat-card">
-          <h3>Hours Worked</h3>
-          <p className="stat-value">{workedHours}</p>
-          <span className="stat-sub">Today</span>
-        </div>
-        <div className="stat-card">
-          <h3>Pending Tasks</h3>
-          <p className="stat-value">8</p>
-          <span className="stat-sub">2 urgent</span>
-        </div>
-        <div className="stat-card">
-          <h3>Leave Balance</h3>
-          <p className="stat-value">12 days</p>
-          <span className="stat-sub">Available</span>
-        </div>
-      </div>
+      {/* Stats Cards */}
+      <section className="stats-row">
+        {stats.map((stat, idx) => (
+          <div key={idx} className="stat-card" style={{ background: stat.color }}>
+            <h4>{stat.title}</h4>
+            <p className="stat-value">{stat.value}</p>
+            <span className="stat-sub">{stat.sub}</span>
+          </div>
+        ))}
+      </section>
 
       <div className="dashboard-content">
         {/* Left Column */}
         <div className="left-col">
-          {/* Admin Announcements */}
-          <div className="announcements">
-            <h3>Admin Announcements</h3>
-            {announcements.length === 0 ? (
-              <p>No announcements yet.</p>
-            ) : (
-              announcements.map((a, idx) => (
-                <div key={idx} className="announcement">
-                  <h4>
-                    {a.subject}{" "}
-                    <span className={`badge ${a.priority || "medium"}`}>
-                      {a.priority || "Medium"}
-                    </span>
-                  </h4>
+          {/* Announcements */}
+          <section className="announcements">
+            <h3>Announcements</h3>
+            <div className="announcement-scroll">
+              {announcements.slice(0, 4).map((a, idx) => (
+                <div key={idx} className="announcement-card">
+                  <h4>{a.subject}</h4>
                   <p>{a.description}</p>
-                  <span className="meta">
-                    {a.author || "Admin"} •{" "}
-                    {new Date(a.createdAt).toLocaleString()}
-                  </span>
+                  <span className="meta">{new Date(a.createdAt).toLocaleString()}</span>
                 </div>
-              ))
-            )}
-          </div>
+              ))}
+              {announcements.length > 4 && <span className="see-more">See More...</span>}
+            </div>
+          </section>
 
-          {/* Recent Activities */}
-          <div className="recent-activities">
-            <h3>Recent Activities</h3>
-            <ul>
-              <li>✅ Completed "API Integration Testing"</li>
-              <li>🕒 Clocked in at 9:15 AM</li>
-              <li>📅 Submitted leave request</li>
-              <li>💰 Uploaded expense report</li>
-            </ul>
-          </div>
+          {/* Reminders */}
+          <section className="reminders">
+            <h3>Reminders</h3>
+            <div className="reminder-card main" onClick={() => setShowReminderPopup(true)}>
+              <p>+ Add New Reminder</p>
+            </div>
+            {reminders.map((r, idx) => (
+              <div key={idx} className="reminder-card">
+                <p>{r.task}</p>
+                <span>{r.time}</span>
+              </div>
+            ))}
+          </section>
         </div>
 
         {/* Right Column */}
         <div className="right-col">
-          <div className="quick-actions">
+          {/* Quick Actions List */}
+          <section className="quick-actions-list">
             <h3>Quick Actions</h3>
-            <button>Create New Task</button>
-            <button>Request Leave</button>
-            <button>Submit Expense</button>
-            <button>Team Chat</button>
-            <button>View Team</button>
-          </div>
+            <div className="actions-scroll">
+              {actions.map((act, idx) => (
+                <div key={idx} className="action-list-item">
+                  <span>•</span>
+                  <p>{act}</p>
+                </div>
+              ))}
+            </div>
+          </section>
 
-          <div className="upcoming-tasks">
-            <h3>Upcoming Tasks</h3>
-            <div className="task">
-              <p>Code Review - Authentication Module</p>
-              <span className="badge high">High</span>
-            </div>
-            <div className="task">
-              <p>Weekly Team Standup</p>
-              <span className="badge medium">Medium</span>
-            </div>
-            <div className="task">
-              <p>Database Optimization</p>
-              <span className="badge low">Low</span>
+          {/* Achievements */}
+          <section className="achievements">
+            <h3>Achievements</h3>
+            {achievements.map((a, idx) => (
+              <div key={idx} className="achievement-card">
+                <p>{a.title}</p>
+                <span>{a.value}</span>
+              </div>
+            ))}
+          </section>
+        </div>
+      </div>
+
+      {/* Reminder Popup */}
+      {showReminderPopup && (
+        <div className="reminder-popup">
+          <div className="popup-content">
+            <h3>Add Reminder</h3>
+            <input
+              type="text"
+              placeholder="Enter task"
+              value={newReminder}
+              onChange={(e) => setNewReminder(e.target.value)}
+            />
+            <div className="popup-buttons">
+              <button onClick={handleAddReminder}>Add</button>
+              <button onClick={() => setShowReminderPopup(false)}>Cancel</button>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
